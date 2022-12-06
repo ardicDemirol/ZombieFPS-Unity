@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Knife
   m_EditorClassIdentifier: 
   weaponPrefab: {fileID: 6429906086402692983, guid: 2047a79c0b4f5e947a494541188ed7ee, type: 3}
+  animatorOverride: {fileID: 22100000, guid: fda2aeb4fe502f349a0e6d5160133891, type: 2}
   damage: 5
   attackRate: 3
   positionOffset: {x: 0, y: 0, z: 0}

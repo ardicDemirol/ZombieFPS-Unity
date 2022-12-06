@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5ec82a6a7c9abf45acb9cb5ab37e218, type: 3}
   m_Name: Axe
   m_EditorClassIdentifier: 
-  weaponPrefab: {fileID: 7485939422097835960, guid: 6e79e76ce55e3a741bbdcd47aabe969c, type: 3}
+  weaponPrefab: {fileID: 2496178155491432852, guid: b850e7f17175fce498f249047b210641, type: 3}
+  animatorOverride: {fileID: 22100000, guid: 90ce533189d3a1b40b0b38a1d77c2639, type: 2}
   damage: 5
   attackRate: 3
   positionOffset: {x: 0, y: 0, z: 0}

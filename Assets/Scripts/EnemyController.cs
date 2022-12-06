@@ -6,9 +6,11 @@ using UnityEngine.AI;
 
 public class EnemyController : MonoBehaviour
 {
+    private Animator anim;
     private NavMeshAgent agent;
     private Transform player;
 
+    [Header("Move Settings")]
     [SerializeField] float attackRange = 2f;
     [SerializeField] float chaseRange = 5f;
     [SerializeField] float turnSpeed = 15f;
@@ -17,7 +19,13 @@ public class EnemyController : MonoBehaviour
     [SerializeField] float chaseSpeed = 4f;
     [SerializeField] float searchSpeed = 3.5f;
 
+
+    [Header("Attack Settings")]
+    [SerializeField] int damage = 2;
+    [SerializeField] float attackRate = 2f;
+
     private bool isSearched = false;
+    private bool isAttacking = false;
 
 
     enum State
@@ -34,6 +42,7 @@ public class EnemyController : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         player = GameObject.FindWithTag("Player").transform;
+        anim = GetComponent<Animator>();
     }
 
     void Update()
@@ -106,7 +115,7 @@ public class EnemyController : MonoBehaviour
                     agent.enabled = true;
 
                     Invoke("Search", patrolWaitTime);
-
+                    anim.SetBool("Walk",false);
                     isSearched = true;
                 }
                 break;
@@ -126,6 +135,7 @@ public class EnemyController : MonoBehaviour
         agent.speed = searchSpeed;
         agent.isStopped = false;
         isSearched = false;
+        anim.SetBool("Walk", true);
         agent.SetDestination(GetRandomPosition());
     }
 
@@ -135,6 +145,11 @@ public class EnemyController : MonoBehaviour
         {
             return;
         }
+        if (!isAttacking)
+        {
+            StartCoroutine(AttackRoutine());
+        }
+        anim.SetBool("Walk", false);
         agent.velocity = Vector3.zero;
         agent.isStopped = true;
         LookTheTarget(player.position);
@@ -148,7 +163,30 @@ public class EnemyController : MonoBehaviour
         }
         agent.speed = chaseSpeed;
         agent.isStopped = false;
+        anim.SetBool("Walk", true);
         agent.SetDestination(player.position);
+    }
+
+    IEnumerator AttackRoutine()
+    {
+        isAttacking = true;
+        yield return new WaitForSeconds(attackRate);
+        anim.SetTrigger("Attack");
+        yield return new WaitUntil(() => IsAttackingAnimationFinished("EnemyAttack"));
+        isAttacking = false;
+    }
+
+    private bool IsAttackingAnimationFinished(string animationName)
+    {
+        if (!anim.IsInTransition(0) && anim.GetCurrentAnimatorStateInfo(0).IsName(animationName)
+            && anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.95f)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     private Vector3 GetRandomPosition()
@@ -166,6 +204,11 @@ public class EnemyController : MonoBehaviour
         Vector3 lookPos = new Vector3(target.x, target.y, target.z);
         transform.rotation = Quaternion.Slerp(transform.rotation,Quaternion.LookRotation(lookPos-transform.position),
             turnSpeed * Time.deltaTime);
+    }
+
+    public int GetDamage()
+    {
+        return damage;
     }
 
 }

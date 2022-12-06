@@ -12,11 +12,18 @@ public class AttackController : MonoBehaviour
 
     private Animator anim;
 
+    private bool isAttacking = false;
+
     private void Awake()
     {
         mainCamera = GameObject.FindWithTag("CameraPoint").transform;
         anim = mainCamera.GetChild(0).GetComponent<Animator>();
-        SpawnWeapon();
+
+        if (currentWeapon != null)
+        {
+            SpawnWeapon();
+        }
+   
     }
 
     void Start()
@@ -37,16 +44,43 @@ public class AttackController : MonoBehaviour
         {
             return;
         }
-        currentWeapon.SpawnNewWeapon(mainCamera.transform.GetChild(0).GetChild(0));
+        currentWeapon.SpawnNewWeapon(mainCamera.transform.GetChild(0).GetChild(0),anim);
+    }
+
+    public void EquipWeapon(Weapon weaponType)
+    {
+        if(currentWeapon != null)
+        {
+            currentWeapon.Drop();
+        }
+
+        currentWeapon = weaponType;
+        SpawnWeapon();
     }
 
     private void Attack()
     {
-        if (Mouse.current.leftButton.isPressed)
+        if (Mouse.current.leftButton.isPressed && !isAttacking)
         {
-            anim.SetTrigger("Attack");
-            Debug.Log("fd");
+            StartCoroutine(AttackRoutine());    
         }
 
+    }
+
+    private IEnumerator AttackRoutine()
+    {
+        isAttacking = true;
+        anim.SetTrigger("Attack");
+        yield return new WaitForSeconds(currentWeapon.GetAttackRate);
+        isAttacking = false;
+    }
+
+    public int GetDamage()
+    {
+        if(currentWeapon != null)
+        {
+            return currentWeapon.GetDamage;
+        }
+        return 0;
     }
 }
